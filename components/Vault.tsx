@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+'use client'
+import { useState } from 'react';
 import CryptoJS from 'crypto-js';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface PasswordEntry {
   service: string;
@@ -50,8 +52,6 @@ export default function Vault() {
     setIsUnlocked(true);
     setError('');
   };
-
-  // Handle adding a password
   const addPassword = (): void => {
     if (!service || !username || !password) {
       setError('Please fill in all fields.');
@@ -68,7 +68,7 @@ export default function Vault() {
     setError('');
   };
 
-  // Handle deleting a password
+
   const deletePassword = (index: number): void => {
     if (confirm('Are you sure you want to delete this password?')) {
       const newPasswords = passwords.filter((_, i) => i !== index);
@@ -77,37 +77,69 @@ export default function Vault() {
     }
   };
 
-  // Copy to clipboard
   const copyToClipboard = (text: string): void => {
     navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
   };
 
-  // Filter passwords by search
   const filteredPasswords = passwords.filter((entry) =>
     entry.service.toLowerCase().includes(search.toLowerCase())
   );
-
-  // Load passwords and verify master password
-  const loadPasswords = (): React.ReactNode => {
+  const loadPasswords = (): JSX.Element[] => {
     return filteredPasswords.map((entry, index) => {
       try {
         const key = deriveKey(masterPassword);
         const decryptedPassword = CryptoJS.AES.decrypt(entry.encryptedPassword, key).toString(CryptoJS.enc.Utf8);
         return (
-          <div key={index} className="border p-4 mb-2 rounded-lg bg-gray-800 flex justify-between items-center">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="border border-gray-700 p-4 mb-4 rounded-lg bg-gray-800/50 backdrop-blur-md flex justify-between items-center"
+          >
             <div>
-              <strong className="text-lg">{entry.service}</strong>
-              <p>Username: {entry.username} <button onClick={() => copyToClipboard(entry.username)} className="ml-2 text-blue-400 hover:text-blue-300">Copy</button></p>
-              <p>
-                Password: <span className="password-text cursor-pointer" onClick={(e) => {
-                  const span = e.target as HTMLSpanElement;
-                  span.textContent = span.textContent === '••••••••' ? decryptedPassword : '••••••••';
-                }}>••••••••</span>
-                <button onClick={() => copyToClipboard(decryptedPassword)} className="ml-2 text-blue-400 hover:text-blue-300">Copy</button>
+              <strong className="text-xl font-semibold text-white">{entry.service}</strong>
+              <p className="text-gray-300">
+                Username: {entry.username}{' '}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => copyToClipboard(entry.username)}
+                  className="ml-2 text-blue-400 hover:text-blue-300"
+                >
+                  Copy
+                </motion.button>
+              </p>
+              <p className="text-gray-300">
+                Password:{' '}
+                <span
+                  className="password-text cursor-pointer"
+                  onClick={(e) => {
+                    const span = e.target as HTMLSpanElement;
+                    span.textContent = span.textContent === '••••••••' ? decryptedPassword : '••••••••';
+                  }}
+                >
+                  ••••••••
+                </span>{' '}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => copyToClipboard(decryptedPassword)}
+                  className="ml-2 text-blue-400 hover:text-blue-300"
+                >
+                  Copy
+                </motion.button>
               </p>
             </div>
-            <button onClick={() => deletePassword(index)} className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">Delete</button>
-          </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => deletePassword(index)}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+            >
+              Delete
+            </motion.button>
+          </motion.div>
         );
       } catch (e) {
         setError('Invalid master password or corrupted data.');
@@ -118,81 +150,142 @@ export default function Vault() {
   };
 
   return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center">Advanced Password Vault</h1>
-      {error && <p className="text-red-400 mb-4">{error}</p>}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="bg-gray-800/30 backdrop-blur-lg p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-700/50"
+    >
+      <h1 className="text-4xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+        Password Vault
+      </h1>
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="text-red-400 mb-4 text-center"
+          >
+            {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
       {!isUnlocked ? (
         <div>
-          <input
+          <motion.input
             type="password"
             placeholder="Enter Master Password"
             value={masterPassword}
             onChange={(e) => setMasterPassword(e.target.value)}
-            className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded text-white"
+            className="w-full p-3 mb-4 bg-gray-900/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            whileFocus={{ scale: 1.02 }}
           />
-          <button onClick={handleLogin} className="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleLogin}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white p-3 rounded-lg hover:from-blue-600 hover:to-purple-600 transition"
+          >
             Unlock Vault
-          </button>
+          </motion.button>
         </div>
       ) : (
         <div>
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="Search by service..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full p-3 mb-4 bg-gray-700 border border-gray-600 rounded text-white"
-            />
-          </div>
-          <div className="mb-4">
-            <input
+          <motion.input
+            type="text"
+            placeholder="Search by service..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full p-3 mb-4 bg-gray-900/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            whileFocus={{ scale: 1.02 }}
+          />
+          <div className="mb-6">
+            <motion.input
               type="text"
               placeholder="Service (e.g., Gmail)"
               value={service}
               onChange={(e) => setService(e.target.value)}
-              className="w-full p-3 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
+              className="w-full p-3 mb-2 bg-gray-900/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              whileFocus={{ scale: 1.02 }}
             />
-            <input
+            <motion.input
               type="text"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-3 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
+              className="w-full p-3 mb-2 bg-gray-900/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              whileFocus={{ scale: 1.02 }}
             />
-            <input
+            <motion.input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
+              className="w-full p-3 mb-2 bg-gray-900/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              whileFocus={{ scale: 1.02 }}
             />
-            <button onClick={() => setShowGenerator(!showGenerator)} className="w-full bg-purple-600 text-white p-3 rounded hover:bg-purple-700 mb-2">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowGenerator(!showGenerator)}
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white p-3 rounded-lg hover:from-purple-600 hover:to-pink-600 transition mb-2"
+            >
               {showGenerator ? 'Hide Generator' : 'Generate Password'}
-            </button>
-            {showGenerator && (
-              <div className="mb-4 p-4 bg-gray-700 rounded">
-                <p>Generated Password: {generatedPassword || 'Click to generate'}</p>
-                <button onClick={() => generatePassword(12)} className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 mt-2">
-                  Generate
-                </button>
-                {generatedPassword && (
-                  <button onClick={() => copyToClipboard(generatedPassword)} className="ml-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                    Copy
-                  </button>
-                )}
-              </div>
-            )}
-            <button onClick={addPassword} className="w-full bg-green-600 text-white p-3 rounded hover:bg-green-700">
+            </motion.button>
+            <AnimatePresence>
+              {showGenerator && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700"
+                >
+                  <p className="text-gray-300">Generated Password: {generatedPassword || 'Click to generate'}</p>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => generatePassword(12)}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 mt-2"
+                  >
+                    Generate
+                  </motion.button>
+                  {generatedPassword && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => copyToClipboard(generatedPassword)}
+                      className="ml-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                    >
+                      Copy
+                    </motion.button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={addPassword}
+              className="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white p-3 rounded-lg hover:from-green-600 hover:to-teal-600 transition"
+            >
               Add Password
-            </button>
+            </motion.button>
           </div>
-          <div>{loadPasswords()}</div>
-          <button onClick={() => { setIsUnlocked(false); setMasterPassword(''); }} className="w-full bg-red-600 text-white p-3 rounded hover:bg-red-700 mt-4">
+          <div className="max-h-96 overflow-y-auto">{loadPasswords()}</div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              setIsUnlocked(false);
+              setMasterPassword('');
+            }}
+            className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white p-3 rounded-lg hover:from-red-600 hover:to-pink-600 transition mt-4"
+          >
             Lock Vault
-          </button>
+          </motion.button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
