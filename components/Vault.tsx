@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { PlusIcon } from '@heroicons/react/24/solid';
+import { LockClosedIcon, PlusIcon } from '@heroicons/react/24/solid';
 
 import PasswordList from './PasswordList';
 import PasswordModal from './PasswordModal';
@@ -115,9 +115,12 @@ export default function Vault() {
               setIsUnlocked(false);
               setMasterPassword('');
             }}
-            className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white p-3 rounded-lg hover:from-red-600 hover:to-pink-600 transition mt-4"
+            className=" flex gap-2 items-center w-fit bg-gradient-to-r from-purple-900 to-red-700 text-white p-3 rounded-lg hover:from-red-600 hover:to-pink-600 transition mt-4"
           >
-            Lock Vault
+            <LockClosedIcon className="cursor-pointer text-white w-4 h-4" />
+           <span>
+           Lock Vault
+           </span>
           </button>
         </>
       )}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import CryptoJS from 'crypto-js';
 import { PasswordEntry } from './Vault';
+import { LockClosedIcon, TrashIcon } from '@heroicons/react/24/solid';
 
 interface PasswordListProps {
   entries?: PasswordEntry[]; 
@@ -41,19 +42,22 @@ export default function PasswordList({
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex  gap-4 flex-wrap p-2">
       {entries.map((entry, index) => (
         <div
           key={index}
-          className=" p-4 rounded-lg shadow border border-gray-700"
+          className=" py-4 px-8 rounded-2xl shadow border border-gray-600"
         >
           <div className="flex justify-between items-center mb-2">
-            <span className="text-white font-semibold">{entry.service}</span>
+            <div className="flex items-center gap-2">
+              <LockClosedIcon className="cursor-pointer text-purple-500 w-4 h-4" />
+              <span className="text-white font-semibold">{entry.service}</span>
+            </div>
             <button
               onClick={() => deletePassword(index)}
               className="text-red-500 hover:text-red-700 text-sm"
             >
-              Delete
+              <TrashIcon className="cursor-pointer w-4 h-4" />
             </button>
           </div>
           <p className="text-gray-400 text-sm">Username: {entry.username}</p>
