@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import CryptoJS from 'crypto-js';
 import { PasswordEntry } from './Vault';
-import { LockClosedIcon, TrashIcon } from '@heroicons/react/24/solid';
+import { ClipboardDocumentIcon, ClipboardDocumentListIcon, EyeIcon, EyeSlashIcon, LockClosedIcon, TrashIcon } from '@heroicons/react/24/solid';
 
 interface PasswordListProps {
-  entries?: PasswordEntry[]; 
+  entries?: PasswordEntry[];
   masterPassword: string;
   copyToClipboard: (text: string) => void;
   deletePassword: (index: number) => void;
@@ -46,7 +46,7 @@ export default function PasswordList({
       {entries.map((entry, index) => (
         <div
           key={index}
-          className="w-[250px] py-4 px-8 rounded-2xl shadow border border-gray-600"
+          className="relative w-[250px] py-4 px-8 rounded-2xl shadow border border-gray-600"
         >
           <div className="flex justify-between items-center mb-2">
             <div className="flex items-center gap-2">
@@ -54,8 +54,9 @@ export default function PasswordList({
               <span className="text-white font-semibold">{entry.service}</span>
             </div>
             <button
+             title='Delete the Password Card'
               onClick={() => deletePassword(index)}
-              className="text-red-500 hover:text-red-700 text-sm"
+              className="text-red-500 hover:text-red-700 text-sm hover:bg-red-400/10 rounded-full p-1"
             >
               <TrashIcon className="cursor-pointer w-4 h-4" />
             </button>
@@ -77,15 +78,15 @@ export default function PasswordList({
               }
               className="text-blue-400 hover:underline text-xs"
             >
-              {visibleIndex === index ? 'Hide' : 'Show'}
+              {visibleIndex === index ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
             </button>
-            <button
+            <button title='Copy to Clipboard'
               onClick={() =>
                 copyToClipboard(decryptPassword(entry.encryptedPassword))
               }
-              className="text-yellow-400 hover:underline text-xs"
+              className=" hover:bg-yellow-400/10 rounded-full p-1 absolute right-8 bottom-4 cursor-pointer text-yellow-400 flex items-center hover:text-yellow-500 text-xs"
             >
-              Copy
+               <ClipboardDocumentListIcon className="w-4 h-4" />
             </button>
           </div>
         </div>
