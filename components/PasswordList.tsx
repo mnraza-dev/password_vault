@@ -42,7 +42,7 @@ export default function PasswordList({
   }
 
   return (
-    <div className="flex  gap-4 flex-wrap p-2">
+    <div className="flex justify-between gap-8 flex-wrap p-2">
       {entries.map((entry, index) => (
         <div
           key={index}
