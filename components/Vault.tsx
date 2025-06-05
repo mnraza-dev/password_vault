@@ -88,7 +88,7 @@ export default function Vault() {
   );
 
   // Load passwords and verify master password
-  const loadPasswords = (): JSX.Element[] => {
+  const loadPasswords = (): React.ReactNode => {
     return filteredPasswords.map((entry, index) => {
       try {
         const key = deriveKey(masterPassword);
