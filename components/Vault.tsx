@@ -77,7 +77,7 @@ export default function Vault() {
   );
 
   return (
-    <div className="p-8 ">
+    <div className="p-8">
       <VaultHeader error={error} />
       {!isUnlocked ? (
         <UnlockForm

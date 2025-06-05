@@ -20,9 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} antialiased`}
+        className={`${inter.className} antialiased `}
       >
-        <main className="p-4  h-screen flex justify-center items-center">
+        <main className="p-4   h-screen flex justify-center items-center">
           {children}
         </main>
       </body>

@@ -42,11 +42,11 @@ export default function PasswordList({
   }
 
   return (
-    <div className="flex justify-between gap-8 flex-wrap p-2">
+    <div className="flex justify-between gap-2 flex-wrap p-2">
       {entries.map((entry, index) => (
         <div
           key={index}
-          className=" py-4 px-8 rounded-2xl shadow border border-gray-600"
+          className="w-[250px] py-4 px-8 rounded-2xl shadow border border-gray-600"
         >
           <div className="flex justify-between items-center mb-2">
             <div className="flex items-center gap-2">
